@@ -1,34 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { ReactNode, useState, useMemo, useId, ReactElement } from "react";
+import "./App.css";
+import { ModalContext } from "./contexts/ModalContext";
+import Modal from "./components/Modal";
+import { uuid } from "./utils/uuid";
+import Screen1 from "./components/Screen1";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [modals, setModals] = useState<ReactElement[]>([]);
+
+  const actions = useMemo(
+    () => ({
+      push: (node: ReactNode) => {
+        const key = uuid();
+
+        const onClose = () => {
+          setModals((preModals) =>
+            preModals.filter((modal) => modal.key !== key)
+          );
+        };
+
+        const modal = (
+          <Modal key={key} onClose={onClose}>
+            {node}
+          </Modal>
+        );
+        setModals((prevModals) => [...prevModals, modal]);
+      },
+    }),
+    []
+  );
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <ModalContext.Provider value={actions}>
+      <div className="App">
+        {modals}
+        <Screen1 />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
+    </ModalContext.Provider>
+  );
 }
 
-export default App
+export default App;
