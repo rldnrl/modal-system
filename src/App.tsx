@@ -10,10 +10,11 @@ function App() {
 
   const actions = useMemo(
     () => ({
-      push: (node: ReactNode) => {
+      push: (node: ReactNode, trigger: HTMLElement) => {
         const key = uuid();
 
         const onClose = () => {
+          trigger.focus();
           setModals((preModals) =>
             preModals.filter((modal) => modal.key !== key)
           );
